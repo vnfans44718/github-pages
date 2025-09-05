@@ -1,0 +1,33 @@
+version: "3.9"
+services:
+  server:
+    build: ./server
+    container_name: myapp-server
+    ports:
+      - "5000:5000"
+    env_file:
+      - ./server/.env
+    volumes:
+      - ./server:/app
+      - /app/node_modules
+    command: npm run dev
+    depends_on:
+      - redis   # redis가 먼저 올라와야 서버 실행됨
+
+  client:
+    build: ./client
+    container_name: myapp-client
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./client:/app
+      - /app/node_modules
+    command: npm start
+    depends_on:
+      - server
+
+  redis:
+    image: redis:6
+    container_name: myapp-redis
+    ports:
+      - "6379:6379"
